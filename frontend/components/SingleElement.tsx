@@ -1,26 +1,28 @@
+import {useBack} from "@/service";
+import {useRouter} from "next/navigation";
+import {useState} from "react";
+
 export default function SingleElement({todo} : any){
-    function update(number: number) {
-        return undefined;
+    const router = useRouter();
+    const [status, setStatus] = useState(todo.state)
+
+    function update() {
+        useBack.updateTodo(todo).then(() => setStatus(!status))
     }
 
-    function remove(number: number) {
-        return undefined;
+    function remove() {
+        useBack.deleteTodo(todo.id).then(() => router.refresh())
     }
 
     return (
-        todo.forEach(function ({el} : any) {
-            console.log(el)
-            return (
-                <div className={`flex space-x-2`}>
-                    <p>{el.title} - Stato: {el.state}</p>
-                    <button className={`border-2 border-cyan-950 p-1`} onClick={update(el.id)}>
-                        Update
-                    </button>
-                    <button className={`border-2 bg-red-600 border-cyan-950 p-1`} onClick={remove(el.id)}>
-                        Remove
-                    </button>
-                </div>
-            )
-        })
+        <div className={`flex items-center space-x-2 justify-end mb-2`}>
+            <p>{todo.title} - Stato: {!status ? 'Da fare' : 'Completato'}</p>
+            <button className={`border-2 bg-cyan-500 border-cyan-800 p-1`} onClick={update}>
+                Update
+            </button>
+            <button className={`border-2 bg-red-500 border-red-800 p-1`} onClick={remove}>
+                Remove
+            </button>
+        </div>
     )
 }

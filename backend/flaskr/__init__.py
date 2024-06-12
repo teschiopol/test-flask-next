@@ -1,5 +1,9 @@
 import os
 from flask import Flask
+from flask_cors import CORS
+
+prefix = '/api/todo/'
+todos = []
 
 def create_app(test_config=None):
     # create and configure the app
@@ -8,7 +12,8 @@ def create_app(test_config=None):
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
     )
-
+    CORS(app)
+    app.config['CORS_HEADERS'] = 'Content-Type'
 
     # ensure the instance folder exists
     try:
@@ -16,27 +21,20 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # a simple page that says hello
-    @app.route('/')
-    def hello():
-        return 'Hello, World!'
-
-    @app.route('/list', methods=['GET'])
+    @app.route(prefix, methods=['GET'])
     def listAll():
-        listData = [{'id': 4, 'title': 'Fare test', 'state': 0}]
+        return {'result': 'OK', 'content': todos }
 
-        return {'result': 'OK', 'content': listData }
-
-    @app.route('/create', methods=['POST'])
+    @app.route(prefix, methods=['POST', 'OPTIONS'])
     def createElement():
         return {'result': 'OK'}
 
-    @app.route('/update', methods=['PATCH'])
-    def updateElement():
+    @app.route(prefix + '<int:id>', methods=['PATCH'])
+    def updateElement(id):
         return {'result': 'OK'}
 
-    @app.route('/delete', methods=['DELETE'])
-    def deleteElement():
+    @app.route(prefix + '<int:id>', methods=['DELETE'])
+    def deleteElement(id):
         return {'result': 'OK'}
 
     return app

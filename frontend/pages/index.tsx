@@ -1,25 +1,26 @@
 import { Inter } from "next/font/google";
 import {useEffect, useState} from "react";
 import SingleElement from "@/components/SingleElement";
+import {useBack} from "@/service";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
 
   const [listAll, setListAll] = useState([])
-
   const [newElement, setElement] = useState('')
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-
-  })
+    useBack.listTodo().then(r => setListAll(r.content));
+  }, []);
 
   function addNew() {
     setLoading(true);
     if (newElement !== '') {
+      let obj : any = {id: Math.floor(Math.random() * 10000), state: false, title: newElement};
       // @ts-ignore
-      setListAll([{id: 1, state: 0, title: newElement}])
+      useBack.createTodo(obj).then(() => setListAll(listAll.concat([obj])))
       setElement('');
     } else {
       alert('Elemento vuoto');
@@ -40,20 +41,17 @@ export default function Home() {
             id={'newElement'}
             name={'newElement'}
             type={'text'}
+            autoComplete={'off'}
         />
-        <button className={`border-2 border-cyan-950 p-2`} onClick={addNew} disabled={loading}>
+        <button className={`border-2 bg-green-500 border-green-800 p-2`} onClick={addNew} disabled={loading}>
           Aggiungi
         </button>
       </div>
       <div>
         {
-          listAll.length < 1 ? (<p>Tutto finito</p>) : (<SingleElement todo={listAll} />)
+          listAll.length < 1 ? (<p>Tutto finito</p>) : (listAll.map((el : any) => <SingleElement key={el.id} todo={el} />))
         }
       </div>
-
-
-
-
     </main>
   );
 }
